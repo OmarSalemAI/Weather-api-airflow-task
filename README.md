@@ -15,14 +15,25 @@ The primary objective of this project is to gain hands-on experience with **Apac
 
 ## 🏗️ Architecture Overview
 
+### High-Level AWS Architecture
 
-### Infrastructure Components
-- Apache Airflow running on an EC2 instance in a Public Subnet
-- Amazon RDS (PostgreSQL) deployed in a Private Subnet
-- Amazon S3 used as a Data Lake / Staging Layer
-- Custom AWS VPC with isolated public and private subnets
-- Secure networking via Security Groups
-- Authentication and authorization using IAM Roles
+
+This diagram illustrates the overall system architecture, showing how Apache Airflow, Amazon RDS, and Amazon S3 interact within a custom AWS VPC.
+
+---
+
+## 🌐 VPC & Networking Architecture
+
+![AWS VPC Resource Map](vpc-architecture.png)
+
+This diagram represents the **AWS VPC resource map**, highlighting:
+- Custom VPC configuration
+- Public and private subnets across multiple Availability Zones
+- Route tables for traffic management
+- Internet Gateway for public access
+- VPC Endpoint for secure S3 access from private resources
+
+This setup ensures **network isolation**, **secure connectivity**, and adherence to cloud networking best practices.
 
 ---
 
@@ -37,60 +48,65 @@ The DAG is organized using **Task Groups** to improve readability, modularity, a
 ## 🧩 Pipeline Workflow
 
 ### 1️⃣ Data Ingestion
-- Uses `HttpSensor` to verify Weather API availability
+- Checks Weather API availability using `HttpSensor`
 - Extracts weather data using HTTP operators
-- Shares data between tasks using XCom
+- Shares data between tasks using **XCom**
 
 ### 2️⃣ Data Transformation
-- Transforms raw JSON data using `PythonOperator` and Pandas
-- Converts temperature units from Kelvin to Fahrenheit
-- Adds time-based features (record time, sunrise, sunset)
-- Exports transformed data to CSV as an intermediate artifact
+- Transforms raw JSON data using `PythonOperator` and **Pandas**
+- Converts temperature units from **Kelvin → Fahrenheit**
+- Adds time-based features:
+  - Record timestamp  
+  - Sunrise & sunset times
+- Writes transformed data to CSV as an intermediate artifact
 
 ### 3️⃣ Data Loading
-- Creates PostgreSQL tables automatically using SQL operators
+- Automatically creates PostgreSQL tables using SQL operators
 - Loads transformed data using `PostgresHook` and `COPY`
 - Imports city lookup data from S3 to RDS using  
   `aws_s3.table_import_from_s3`
 
 ### 4️⃣ Data Enrichment
-- Joins weather data with city lookup tables inside PostgreSQL
-- Produces analytics-ready datasets
+- Performs SQL **JOINs** between weather data and city lookup tables
+- Produces enriched, analytics-ready datasets
 
 ### 5️⃣ Data Export
-- Exports final results to Amazon S3
-- Uses timestamp-based versioning for historical tracking
+- Exports final results to **Amazon S3**
+- Uses **timestamp-based versioning** for historical tracking
 
 ---
 
 ## 🔐 Security & Best Practices
 - No hard-coded credentials
-- IAM Role for EC2 to access S3
-- IAM Role for RDS to support S3 import
+- IAM Role for EC2 to allow secure S3 access
+- IAM Role for RDS to support S3 imports
 - Least Privilege access model
 - Database isolated in a private subnet
+- Secure routing using dedicated route tables and VPC endpoints
 
 ---
 
 ## 🚀 Tech Stack
-- Apache Airflow
-- AWS EC2
-- Amazon RDS (PostgreSQL)
-- Amazon S3
-- Python
-- Pandas
-- SQL
+- **Apache Airflow**
+- **AWS EC2**
+- **Amazon RDS (PostgreSQL)**
+- **Amazon S3**
+- **AWS VPC**
+- **Python**
+- **Pandas**
+- **SQL**
 
 ---
 
 ## 🎯 Key Learnings
-- Designing clean and maintainable Airflow DAGs
-- Using Task Groups for pipeline organization
+- Designing clean and maintainable **Airflow DAGs**
+- Using **Task Groups** for pipeline organization
+- Building secure **AWS VPC networking architectures**
 - Working with Airflow Providers (HTTP, Postgres, AWS)
-- Building secure and scalable cloud-based ETL pipelines
-- Applying real-world data engineering architecture patterns
+- Applying real-world **data engineering and cloud architecture patterns**
 
 ---
+
 
 ## 👤 Author
 **Omar Salem**  
